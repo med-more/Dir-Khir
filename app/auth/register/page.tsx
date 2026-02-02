@@ -135,6 +135,17 @@ export default function RegisterPage() {
       {/* Right side - Enhanced Register Form */}
       <div className="flex flex-col justify-center items-center px-4 sm:px-6 py-8 sm:py-12 md:py-0 relative z-10 bg-white md:bg-transparent overflow-y-auto">
         <div className="w-full max-w-md">
+          {/* Mobile Back to Home Button */}
+          <div className="md:hidden mb-4 sm:mb-6">
+            <Link 
+              href="/" 
+              className="inline-flex items-center gap-2 text-black hover:text-red-600 font-bold transition-colors group"
+            >
+              <Home className="w-4 h-4 group-hover:scale-110 transition-transform" />
+              <span className="text-sm">Retour à l'accueil</span>
+            </Link>
+          </div>
+          
           {/* Mobile Logo */}
           <div className="md:hidden mb-6 sm:mb-8 md:mb-10 text-center">
             <div className="flex items-center justify-center mb-3 sm:mb-4">

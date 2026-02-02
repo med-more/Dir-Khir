@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { ArrowUpRight, MapPin, Users, Flame, ChevronRight, HandHeart, Sparkles, Star, Heart, MessageCircle, Phone, Clock, CheckCircle2, Search, Menu, X, FileText } from 'lucide-react';
+import { ArrowUpRight, MapPin, Users, Flame, ChevronRight, HandHeart, Sparkles, Star, Heart, MessageCircle, Phone, Clock, CheckCircle2, Menu, X, FileText, Facebook, Twitter, Instagram } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import Image from 'next/image';
@@ -126,15 +126,35 @@ export default function HomePage() {
               <span className="hidden sm:inline text-black/70">|</span>
               <span className="hidden md:inline text-black/80 text-xs sm:text-sm">De Tanger à Lagouira</span>
             </div>
-            <div className="flex items-center gap-2 sm:gap-4">
-              <div className="hidden lg:flex items-center gap-2 bg-white/50 backdrop-blur-sm px-3 sm:px-4 py-1 sm:py-1.5 rounded-full border border-red-600/30">
-                <Search className="w-3 h-3 sm:w-4 sm:h-4 text-red-600" />
-                <input 
-                  type="text" 
-                  placeholder="Rechercher..." 
-                  className="bg-transparent border-none outline-none text-black text-xs sm:text-sm w-32 sm:w-40 placeholder:text-black/60 font-bold"
-                />
-              </div>
+            <div className="flex items-center gap-3 sm:gap-4">
+              {/* Social Links */}
+              <a 
+                href="https://facebook.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hover:scale-110 transition-transform duration-300 cursor-pointer p-1 flex items-center justify-center"
+                aria-label="Facebook"
+              >
+                <Facebook className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={2} style={{ stroke: '#000000', color: '#000000' }} />
+              </a>
+              <a 
+                href="https://twitter.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hover:scale-110 transition-transform duration-300 cursor-pointer p-1 flex items-center justify-center"
+                aria-label="Twitter"
+              >
+                <Twitter className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={2} style={{ stroke: '#000000', color: '#000000' }} />
+              </a>
+              <a 
+                href="https://instagram.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hover:scale-110 transition-transform duration-300 cursor-pointer p-1 flex items-center justify-center"
+                aria-label="Instagram"
+              >
+                <Instagram className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={2} style={{ stroke: '#000000', color: '#000000' }} />
+              </a>
             </div>
           </div>
         </div>
