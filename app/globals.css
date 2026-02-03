@@ -518,4 +518,35 @@
   .glow-gold:hover {
     box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
   }
+
+  /* Toast Styling - Moroccan Inspired */
+  .toaster {
+    --toast-bg: #FFF8E7;
+    --toast-border: rgba(193, 122, 63, 0.3);
+    --toast-text: #000000;
+    --toast-success-border: rgba(45, 134, 89, 0.5);
+    --toast-error-border: rgba(220, 38, 38, 0.5);
+    --toast-warning-border: rgba(212, 175, 55, 0.5);
+  }
+
+  [data-sonner-toast] {
+    background: var(--toast-bg) !important;
+    border: 2px solid var(--toast-border) !important;
+    color: var(--toast-text) !important;
+    font-family: var(--font-sans) !important;
+    font-weight: 700 !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  [data-sonner-toast][data-type="success"] {
+    border-color: var(--toast-success-border) !important;
+  }
+
+  [data-sonner-toast][data-type="error"] {
+    border-color: var(--toast-error-border) !important;
+  }
+
+  [data-sonner-toast][data-type="warning"] {
+    border-color: var(--toast-warning-border) !important;
+  }
 }

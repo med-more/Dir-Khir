@@ -236,15 +236,89 @@ export async function signUp(name: string, email: string, password: string) {
  */
 export async function signOut() {
   try {
-    const baseURL = process.env.BETTER_AUTH_URL || process.env.AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    console.log('=== SIGNOUT START ===');
     
-    await fetch(`${baseURL}/api/auth/sign-out`, {
+    // Utiliser directement l'API route handler de Better-Auth
+    const cookieStore = await cookies();
+    const cookieHeader = Array.from(cookieStore.getAll())
+      .map(cookie => `${cookie.name}=${cookie.value}`)
+      .join('; ');
+    
+    // Créer une requête Request pour l'API route handler
+    const baseURL = process.env.BETTER_AUTH_URL || process.env.AUTH_URL || 'http://localhost:3000';
+    const requestUrl = new URL(`${baseURL}/api/auth/sign-out`);
+    const request = new Request(requestUrl, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Cookie': cookieHeader,
+        'Origin': baseURL,
+      },
     });
+
+    // Appeler directement l'API route handler
+    const { POST } = await import('@/app/api/auth/[...all]/route');
+    const response = await POST(request);
     
+    console.log('=== SIGNOUT RESPONSE ===');
+    console.log('Status:', response.status);
+    
+    // Extraire et supprimer les cookies de la réponse
+    let setCookieHeaders: string[] = [];
+    try {
+      if (typeof response.headers.getSetCookie === 'function') {
+        setCookieHeaders = response.headers.getSetCookie();
+      } else {
+        const setCookieHeader = response.headers.get('set-cookie');
+        if (setCookieHeader) {
+          setCookieHeaders = [setCookieHeader];
+        }
+      }
+    } catch (e) {
+      console.error('=== SIGNOUT COOKIE EXTRACTION ERROR ===', e);
+    }
+    
+    // Supprimer tous les cookies d'authentification
+    const authCookieNames = ['better-auth.session_token', 'better-auth.session', 'session'];
+    for (const cookieName of authCookieNames) {
+      try {
+        cookieStore.delete(cookieName);
+        console.log(`=== SIGNOUT COOKIE DELETED: ${cookieName} ===`);
+      } catch (e) {
+        // Ignore errors for cookies that don't exist
+      }
+    }
+    
+    // Supprimer tous les cookies qui commencent par "better-auth"
+    const allCookies = cookieStore.getAll();
+    for (const cookie of allCookies) {
+      if (cookie.name.startsWith('better-auth') || cookie.name.includes('session')) {
+        try {
+          cookieStore.delete(cookie.name);
+          console.log(`=== SIGNOUT COOKIE DELETED: ${cookie.name} ===`);
+        } catch (e) {
+          // Ignore errors
+        }
+      }
+    }
+    
+    console.log('=== SIGNOUT SUCCESS ===');
     redirect('/');
   } catch (error) {
-    console.error('SignOut error:', error);
+    console.error('=== SIGNOUT EXCEPTION ===');
+    console.error('Error:', error);
+    // Même en cas d'erreur, supprimer les cookies et rediriger
+    try {
+      const cookieStore = await cookies();
+      const allCookies = cookieStore.getAll();
+      for (const cookie of allCookies) {
+        if (cookie.name.startsWith('better-auth') || cookie.name.includes('session')) {
+          cookieStore.delete(cookie.name);
+        }
+      }
+    } catch (e) {
+      // Ignore cleanup errors
+    }
     redirect('/');
   }
 }

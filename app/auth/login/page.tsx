@@ -12,6 +12,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { signIn } from '@/lib/auth/actions'
 import { useRouter } from 'next/navigation'
+import { toast } from '@/lib/utils/toast'
 
 // Zod Schema for Login
 const loginSchema = z.object({
@@ -33,6 +34,16 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
+  // Check if user was redirected from registration
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('registered') === 'true') {
+      toast.success('Compte créé avec succès !', 'Vous pouvez maintenant vous connecter.')
+      // Clean up the URL
+      router.replace('/auth/login')
+    }
+  }, [router])
+
   const {
     register,
     handleSubmit,
@@ -45,13 +56,19 @@ export default function LoginPage() {
     setError(null)
     setIsLoading(true)
     
+    const loadingToast = toast.loading('Connexion en cours...')
+    
     const result = await signIn(data.email, data.password)
     
     if (result.error) {
+      toast.error('Erreur de connexion', result.error)
       setError(result.error)
       setIsLoading(false)
     } else {
-      router.push('/dashboard')
+      toast.success('Connexion réussie !', 'Redirection vers votre tableau de bord...')
+      setTimeout(() => {
+        router.push('/dashboard')
+      }, 1000)
     }
   }
 

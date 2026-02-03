@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { ArrowUpRight, MapPin, Users, Flame, ChevronRight, HandHeart, Sparkles, Star, Heart, MessageCircle, Phone, Clock, CheckCircle2, Menu, X, FileText, Facebook, Twitter, Instagram } from 'lucide-react';
+import { ArrowUpRight, MapPin, Users, Flame, ChevronRight, HandHeart, Sparkles, Star, Heart, MessageCircle, Phone, Clock, CheckCircle2, Menu, X, FileText, Facebook, Twitter, Instagram, LogIn, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import Image from 'next/image';
 import { NeedsList } from '@/app/components/needs-list';
 import { getNeeds } from '@/lib/actions/needs';
+import { getSession } from '@/lib/auth/actions';
 
 const testimonials = [
   {
@@ -61,6 +62,7 @@ export default function HomePage() {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [initialNeeds, setInitialNeeds] = useState<any[]>([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   // Charger les besoins initiaux
   const loadNeeds = async () => {
@@ -77,6 +79,33 @@ export default function HomePage() {
 
   useEffect(() => {
     loadNeeds();
+    
+    // Check if user is logged in
+    const checkSession = async () => {
+      try {
+        const session = await getSession();
+        setIsLoggedIn(!!(session && session.user));
+      } catch (error) {
+        setIsLoggedIn(false);
+      }
+    };
+    checkSession();
+    
+    // Refresh session check periodically and on focus
+    const handleFocus = () => {
+      checkSession();
+    };
+    
+    const interval = setInterval(() => {
+      checkSession();
+    }, 10000); // Check every 10 seconds
+    
+    window.addEventListener('focus', handleFocus);
+    
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+    };
   }, []);
 
   // Recharger les besoins périodiquement et quand la page redevient visible
@@ -207,23 +236,42 @@ export default function HomePage() {
 
             {/* Auth Buttons */}
             <div className="flex items-center gap-2 sm:gap-3">
-              <Link 
-                href="/auth/login" 
-                className="hidden sm:block text-xs sm:text-sm font-bold text-black hover:text-red-600 transition-colors px-3 sm:px-4 py-2"
-              >
-                Connexion
-              </Link>
-              <Button 
-                size="default" 
-                className="bg-[#C17A3F] hover:bg-[#A05A2E] text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 text-xs sm:text-sm rounded-lg border-2 border-[#D4AF37]/30" 
-                asChild
-              >
-                <Link href="/auth/register">
-                  <span className="hidden sm:inline">Rejoindre</span>
-                  <span className="sm:hidden">+</span>
-                  <ArrowUpRight className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-1.5" />
-                </Link>
-            </Button>
+              {!isLoggedIn ? (
+                <>
+                  <Button 
+                    size="default" 
+                    variant="outline"
+                    className="border-2 border-red-600 text-red-600 hover:bg-red-600 hover:text-white font-bold shadow-md hover:shadow-lg transition-all duration-300 px-2 sm:px-3 md:px-4 py-2 sm:py-2.5 text-xs sm:text-sm rounded-lg" 
+                    asChild
+                  >
+                    <Link href="/auth/login">
+                      <LogIn className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1.5" />
+                      <span className="hidden sm:inline">Connexion</span>
+                    </Link>
+                  </Button>
+                  <Button 
+                    size="default" 
+                    className="bg-[#C17A3F] hover:bg-[#A05A2E] text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 px-2 sm:px-3 md:px-6 py-2 sm:py-2.5 text-xs sm:text-sm rounded-lg border-2 border-[#D4AF37]/30" 
+                    asChild
+                  >
+                    <Link href="/auth/register">
+                      <UserPlus className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1.5" />
+                      <span className="hidden sm:inline">Rejoindre</span>
+                    </Link>
+                  </Button>
+                </>
+              ) : (
+                <Button 
+                  size="default" 
+                  className="bg-[#C17A3F] hover:bg-[#A05A2E] text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 text-xs sm:text-sm rounded-lg border-2 border-[#D4AF37]/30" 
+                  asChild
+                >
+                  <Link href="/dashboard">
+                    Mon Espace
+                    <ArrowUpRight className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-1.5" />
+                  </Link>
+                </Button>
+              )}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="lg:hidden p-2 text-black hover:text-red-600 transition-colors cursor-pointer"
@@ -253,8 +301,37 @@ export default function HomePage() {
                   {item.label}
                 </Link>
               ))}
-          </nav>
-        </div>
+              {!isLoggedIn && (
+                <>
+                  <Link
+                    href="/auth/login"
+                    className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base text-black hover:bg-[#FFF8E7] rounded-lg font-bold border-l-4 border-transparent hover:border-red-600 transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <LogIn className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" />
+                    Connexion
+                  </Link>
+                  <Link
+                    href="/auth/register"
+                    className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base text-black hover:bg-[#FFF8E7] rounded-lg font-bold border-l-4 border-transparent hover:border-red-600 transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <UserPlus className="w-4 h-4 sm:w-5 sm:h-5 text-[#C17A3F]" />
+                    Rejoindre
+                  </Link>
+                </>
+              )}
+              {isLoggedIn && (
+                <Link
+                  href="/dashboard"
+                  className="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base text-black hover:bg-[#FFF8E7] rounded-lg font-bold border-l-4 border-transparent hover:border-red-600"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Mon Espace
+                </Link>
+              )}
+            </nav>
+          </div>
         )}
       </header>
 
@@ -815,6 +892,18 @@ export default function HomePage() {
           </div>
         </div>
         <div className="absolute inset-0 zellige-pattern opacity-10" />
+        {/* Ce Que Dit SVG Background */}
+        <div className="absolute top-0 right-0 z-[1] pointer-events-none overflow-hidden" style={{ width: '60%', height: '100%', transform: 'translateX(5%)' }}>
+          <Image
+            src="/assets/Ce Que Dit.svg"
+            alt="Ce Que Dit decorative pattern"
+            fill
+            className="object-contain object-right-top"
+            priority={false}
+            unoptimized
+            aria-hidden="true"
+          />
+        </div>
         <div className="mx-auto max-w-7xl px-3 sm:px-4 md:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-8 sm:mb-12 md:mb-16">
             <div className="relative inline-flex items-center gap-1.5 sm:gap-2 px-4 sm:px-6 py-2 sm:py-2.5 mb-4 sm:mb-6">
@@ -938,6 +1027,18 @@ export default function HomePage() {
           </div>
         </div>
         <div className="absolute inset-0 zellige-pattern opacity-10" />
+        {/* Questions SVG Background */}
+        <div className="absolute top-0 left-0 z-[1] pointer-events-none overflow-hidden" style={{ width: '60%', height: '100%', transform: 'translateX(-5%)' }}>
+          <Image
+            src="/assets/Questions.svg"
+            alt="Questions decorative pattern"
+            fill
+            className="object-contain object-left-top"
+            priority={false}
+            unoptimized
+            aria-hidden="true"
+          />
+        </div>
         <div className="mx-auto max-w-4xl px-3 sm:px-4 md:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-8 sm:mb-12 md:mb-16">
             <div className="relative inline-flex items-center gap-1.5 sm:gap-2 px-4 sm:px-6 py-2 sm:py-2.5 mb-4 sm:mb-6">
@@ -978,7 +1079,7 @@ export default function HomePage() {
             {faqItems.map((item, idx) => (
               <div
                 key={idx}
-                className="group relative overflow-hidden rounded-3xl border-4 border-[#C17A3F]/30 bg-white transition-all duration-500 hover:shadow-2xl hover:border-[#C17A3F] hover:-translate-y-1 cursor-pointer"
+                className="group relative overflow-hidden rounded-xl sm:rounded-2xl md:rounded-3xl border-2 sm:border-3 md:border-4 border-[#C17A3F]/30 bg-white transition-all duration-500 hover:shadow-2xl hover:border-[#C17A3F] hover:-translate-y-1 cursor-pointer"
                 onClick={() => setExpandedFaq(expandedFaq === idx ? null : idx)}
                 role="button"
                 tabIndex={0}
@@ -992,30 +1093,30 @@ export default function HomePage() {
                 <div className="absolute inset-0 zellige-pattern opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-500" />
 
                 {/* Decorative Corner Elements - Moroccan Style */}
-                <div className="absolute top-0 right-0 w-24 h-24 overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#C17A3F]/20 to-transparent rounded-bl-full transform rotate-45 translate-x-8 -translate-y-8 group-hover:scale-110 transition-transform duration-700" />
+                <div className="absolute top-0 right-0 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 overflow-hidden">
+                  <div className="absolute top-0 right-0 w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 bg-gradient-to-br from-[#C17A3F]/20 to-transparent rounded-bl-full transform rotate-45 translate-x-6 -translate-y-6 sm:translate-x-8 sm:-translate-y-8 group-hover:scale-110 transition-transform duration-700" />
                 </div>
-                <div className="absolute bottom-0 left-0 w-20 h-20 overflow-hidden">
-                  <div className="absolute bottom-0 left-0 w-28 h-28 bg-gradient-to-tr from-[#2D8659]/20 to-transparent rounded-tr-full transform -rotate-45 -translate-x-6 translate-y-6 group-hover:scale-110 transition-transform duration-700" />
+                <div className="absolute bottom-0 left-0 w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 overflow-hidden">
+                  <div className="absolute bottom-0 left-0 w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-gradient-to-tr from-[#2D8659]/20 to-transparent rounded-tr-full transform -rotate-45 -translate-x-4 translate-y-4 sm:-translate-x-6 sm:translate-y-6 group-hover:scale-110 transition-transform duration-700" />
                 </div>
 
                 {/* Top Decorative Border - Moroccan Pattern */}
-                <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-transparent via-[#C17A3F] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-16 h-0.5 bg-[#D4AF37] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute top-0 left-0 right-0 h-1 sm:h-2 bg-gradient-to-r from-transparent via-[#C17A3F] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute top-1 sm:top-2 left-1/2 transform -translate-x-1/2 w-12 sm:w-16 h-0.5 bg-[#D4AF37] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                 {/* Geometric Pattern Overlay */}
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                  <div className="absolute top-4 right-4 w-12 h-12 border-2 border-[#C17A3F]/30 rounded-lg transform rotate-45" />
-                  <div className="absolute bottom-4 left-4 w-8 h-8 border-2 border-[#2D8659]/30 rounded-full" />
+                  <div className="absolute top-2 right-2 sm:top-4 sm:right-4 w-8 h-8 sm:w-12 sm:h-12 border-2 border-[#C17A3F]/30 rounded-lg transform rotate-45" />
+                  <div className="absolute bottom-2 left-2 sm:bottom-4 sm:left-4 w-6 h-6 sm:w-8 sm:h-8 border-2 border-[#2D8659]/30 rounded-full" />
                 </div>
 
                 {/* Content */}
-                <div className="relative py-5 px-6 flex items-center justify-between z-10">
-                  <h3 className="font-bold text-lg pr-6 group-hover:text-[#C17A3F] transition-colors text-black">
+                <div className="relative py-3 px-4 sm:py-4 sm:px-5 md:py-5 md:px-6 flex items-center justify-between z-10">
+                  <h3 className="font-bold text-sm sm:text-base md:text-lg pr-3 sm:pr-4 md:pr-6 group-hover:text-[#C17A3F] transition-colors text-black">
                     {item.question}
                   </h3>
                   <ChevronRight
-                    className={`w-5 h-5 flex-shrink-0 text-[#C17A3F] transition-all duration-300 ${
+                    className={`w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 text-[#C17A3F] transition-all duration-300 ${
                       expandedFaq === idx ? 'rotate-90' : ''
                     }`}
                   />
@@ -1024,11 +1125,11 @@ export default function HomePage() {
                 {expandedFaq === idx && (
                   <>
                     {/* Moroccan Style Divider */}
-                    <div className="relative mx-6 mb-4">
+                    <div className="relative mx-4 sm:mx-5 md:mx-6 mb-3 sm:mb-4">
                       <div className="h-px bg-gradient-to-r from-transparent via-[#C17A3F]/30 to-transparent" />
-                      <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-[#D4AF37] rounded-full" />
+                      <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#D4AF37] rounded-full" />
                     </div>
-                    <div className="pb-5 px-6 text-black leading-relaxed font-bold relative z-10 text-sm">
+                    <div className="pb-3 px-4 sm:pb-4 sm:px-5 md:pb-5 md:px-6 text-black leading-relaxed font-bold relative z-10 text-xs sm:text-sm">
                     {item.answer}
                   </div>
                   </>
@@ -1193,6 +1294,18 @@ export default function HomePage() {
         </div>
         {/* Decorative Background Elements */}
         <div className="absolute inset-0 zellige-pattern opacity-10" />
+        {/* Footer SVG Background */}
+        <div className="absolute bottom-0 right-0 z-[1] pointer-events-none overflow-hidden" style={{ width: '70%', height: '100%', transform: 'translateX(-5%)' }}>
+          <Image
+            src="/assets/footer.svg"
+            alt="Footer decorative pattern"
+            fill
+            className="object-contain object-right-bottom"
+            priority={false}
+            unoptimized
+            aria-hidden="true"
+          />
+        </div>
         <div className="absolute top-0 left-0 w-96 h-96 bg-[#C17A3F]/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#2D8659]/5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
         

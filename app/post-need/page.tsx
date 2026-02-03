@@ -13,6 +13,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { createNeed } from '@/lib/actions/needs'
 import { useRouter } from 'next/navigation'
+import { toast } from '@/lib/utils/toast'
 
 const steps = [
   { id: 1, title: 'Informations de Base', icon: '1', color: 'red' },
@@ -108,6 +109,8 @@ export default function PostNeedPage() {
     setIsSubmitting(true)
     setSubmitError(null)
     
+    const loadingToast = toast.loading('Publication de votre besoin...')
+    
     const result = await createNeed({
       title: data.title,
       description: data.description,
@@ -118,15 +121,19 @@ export default function PostNeedPage() {
     })
 
     if (result.error) {
+      toast.error('Erreur de publication', result.error)
       setSubmitError(result.error)
       setIsSubmitting(false)
     } else {
       console.log('=== POSTNEED: Need created successfully, redirecting ===');
+      toast.success('Besoin publié avec succès !', 'Votre demande est maintenant visible par la communauté.')
       // Revalider le cache et rediriger vers la page d'accueil pour voir le nouveau besoin
       router.refresh()
       // Rediriger vers la page d'accueil pour voir le nouveau besoin
       // Utiliser window.location pour forcer un rechargement complet
-      window.location.href = '/'
+      setTimeout(() => {
+        window.location.href = '/'
+      }, 1500)
     }
   }
 
@@ -199,55 +206,55 @@ export default function PostNeedPage() {
             </p>
           </div>
 
-          {/* Progress Steps - Traditional Style */}
-          <div className="mb-8 sm:mb-10 md:mb-12 overflow-x-auto">
+          {/* Progress Steps - Compact Traditional Style */}
+          <div className="mb-6 sm:mb-8 overflow-x-auto">
             <div className="flex items-center justify-between min-w-max sm:min-w-0">
               {steps.map((step, index) => (
                 <div key={step.id} className="flex items-center flex-1 min-w-0">
                   <div className="relative">
                     {step.color === 'red' ? (
-                      <div className={`group relative overflow-hidden rounded-2xl sm:rounded-3xl border-2 sm:border-4 transition-all duration-500 ${
+                      <div className={`group relative overflow-hidden rounded-xl border-2 transition-all duration-300 ${
                         currentStep >= step.id
-                          ? 'border-red-600 bg-white shadow-2xl scale-110' 
+                          ? 'border-red-600 bg-white shadow-lg scale-105' 
                           : 'border-[#C17A3F]/30 bg-white'
-                      }`} style={{ width: '50px', height: '50px' }} className="sm:w-[60px] sm:h-[60px] md:w-[70px] md:h-[70px]">
-                        <div className="absolute inset-0 zellige-pattern opacity-[0.03]"></div>
-                        <div className="absolute top-0 right-0 w-12 h-12 overflow-hidden">
-                          <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-[#C17A3F]/20 to-transparent rounded-bl-full transform rotate-45 translate-x-4 -translate-y-4" />
+                      } w-10 h-10 sm:w-12 sm:h-12`}>
+                        <div className="absolute inset-0 zellige-pattern opacity-[0.02]"></div>
+                        <div className="absolute top-0 right-0 w-6 h-6 overflow-hidden">
+                          <div className="absolute top-0 right-0 w-8 h-8 bg-gradient-to-br from-[#C17A3F]/15 to-transparent rounded-bl-full transform rotate-45 translate-x-2 -translate-y-2" />
                         </div>
                         <div className="relative flex items-center justify-center h-full z-10">
                           {currentStep > step.id ? (
-                            <Check className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-red-600" />
+                            <Check className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-red-600" />
                           ) : (
-                            <span className={`text-lg sm:text-xl md:text-2xl font-black ${currentStep >= step.id ? 'text-red-600' : 'text-black'}`}>
+                            <span className={`text-sm sm:text-base font-black ${currentStep >= step.id ? 'text-red-600' : 'text-black/60'}`}>
                               {step.icon}
                             </span>
                           )}
                         </div>
                       </div>
                     ) : (
-                      <div className={`group relative overflow-hidden rounded-2xl sm:rounded-3xl border-2 sm:border-4 transition-all duration-500 ${
+                      <div className={`group relative overflow-hidden rounded-xl border-2 transition-all duration-300 ${
                         currentStep >= step.id
-                          ? 'border-green-600 bg-white shadow-2xl scale-110' 
+                          ? 'border-green-600 bg-white shadow-lg scale-105' 
                           : 'border-[#C17A3F]/30 bg-white'
-                      }`} style={{ width: '50px', height: '50px' }} className="sm:w-[60px] sm:h-[60px] md:w-[70px] md:h-[70px]">
-                        <div className="absolute inset-0 zellige-pattern opacity-[0.03]"></div>
-                        <div className="absolute top-0 right-0 w-12 h-12 overflow-hidden">
-                          <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-[#2D8659]/20 to-transparent rounded-bl-full transform rotate-45 translate-x-4 -translate-y-4" />
+                      } w-10 h-10 sm:w-12 sm:h-12`}>
+                        <div className="absolute inset-0 zellige-pattern opacity-[0.02]"></div>
+                        <div className="absolute top-0 right-0 w-6 h-6 overflow-hidden">
+                          <div className="absolute top-0 right-0 w-8 h-8 bg-gradient-to-br from-[#2D8659]/15 to-transparent rounded-bl-full transform rotate-45 translate-x-2 -translate-y-2" />
                         </div>
                         <div className="relative flex items-center justify-center h-full z-10">
                           {currentStep > step.id ? (
-                            <Check className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-green-600" />
+                            <Check className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-600" />
                           ) : (
-                            <span className={`text-lg sm:text-xl md:text-2xl font-black ${currentStep >= step.id ? 'text-green-600' : 'text-black'}`}>
+                            <span className={`text-sm sm:text-base font-black ${currentStep >= step.id ? 'text-green-600' : 'text-black/60'}`}>
                               {step.icon}
                             </span>
                           )}
                         </div>
                       </div>
                     )}
-                    <div className="absolute -bottom-8 sm:-bottom-10 left-1/2 transform -translate-x-1/2 w-20 sm:w-24 md:w-28 text-center">
-                      <p className={`text-[9px] sm:text-[10px] md:text-xs font-black uppercase tracking-wide ${
+                    <div className="absolute -bottom-6 sm:-bottom-7 left-1/2 transform -translate-x-1/2 w-16 sm:w-20 text-center">
+                      <p className={`text-[8px] sm:text-[9px] font-bold uppercase tracking-wide ${
                         currentStep >= step.id 
                           ? step.color === 'red' ? 'text-red-600' : 'text-green-600'
                           : 'text-black/40'
@@ -258,7 +265,7 @@ export default function PostNeedPage() {
                   </div>
 
                   {index < steps.length - 1 && (
-                    <div className={`flex-1 h-1.5 sm:h-2 mx-2 sm:mx-3 md:mx-4 rounded-full transition-all duration-300 ${
+                    <div className={`flex-1 h-1 mx-2 sm:mx-3 rounded-full transition-all duration-300 ${
                       currentStep > step.id 
                         ? step.color === 'red' 
                           ? 'bg-gradient-to-r from-red-600 to-green-600' 
@@ -294,16 +301,16 @@ export default function PostNeedPage() {
               <div className="absolute bottom-4 left-4 w-8 h-8 border-2 border-[#2D8659]/30 rounded-full" />
             </div>
 
-            <form id="post-need-form" onSubmit={handleSubmit(onSubmit)} className="relative p-4 sm:p-6 md:p-8 lg:p-10 z-10">
+            <form id="post-need-form" onSubmit={handleSubmit(onSubmit)} className="relative p-4 sm:p-6 md:p-8 z-10">
               {/* Step 1: Basic Info */}
               {currentStep === 1 && (
-                <div className="space-y-4 sm:space-y-5 md:space-y-6">
-                  <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-5 md:mb-6">
-                    <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
-                    <h2 className="font-serif text-xl sm:text-2xl font-black text-black">Informations de Base</h2>
+                <div className="space-y-3 sm:space-y-4">
+                  <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                    <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" />
+                    <h2 className="font-serif text-lg sm:text-xl font-black text-black">Informations de Base</h2>
                   </div>
                   <div>
-                    <label htmlFor="title" className="block text-xs sm:text-sm font-black text-black mb-2 sm:mb-3 uppercase tracking-wide">
+                    <label htmlFor="title" className="block text-xs font-black text-black mb-2 uppercase tracking-wide">
                       De quoi avez-vous besoin ?
                     </label>
                     <Input
@@ -311,7 +318,7 @@ export default function PostNeedPage() {
                       type="text"
                       placeholder="ex: Aide alimentaire, Réparations à domicile, Garde d'enfants..."
                       {...register('title')}
-                      className={`w-full py-4 sm:py-5 md:py-6 border-2 rounded-xl text-sm sm:text-base md:text-lg font-bold text-black ${
+                      className={`w-full py-2.5 sm:py-3 border-2 rounded-lg text-sm font-bold text-black ${
                         errors.title ? 'border-red-600' : 'border-red-600/30 focus:border-red-600'
                       }`}
                     />
@@ -327,13 +334,13 @@ export default function PostNeedPage() {
                   </div>
 
                   <div>
-                    <label htmlFor="category" className="block text-xs sm:text-sm font-black text-black mb-2 sm:mb-3 uppercase tracking-wide">
+                    <label htmlFor="category" className="block text-xs font-black text-black mb-2 uppercase tracking-wide">
                       Catégorie
                     </label>
                     <select
                       id="category"
                       {...register('category')}
-                      className={`w-full py-4 sm:py-5 md:py-6 border-2 rounded-xl bg-white text-black font-bold text-sm sm:text-base md:text-lg focus:outline-none px-3 sm:px-4 cursor-pointer ${
+                      className={`w-full py-2.5 sm:py-3 border-2 rounded-lg bg-white text-black font-bold text-sm focus:outline-none px-3 cursor-pointer ${
                         errors.category ? 'border-red-600' : 'border-red-600/30 focus:border-red-600'
                       }`}
                     >
@@ -357,13 +364,13 @@ export default function PostNeedPage() {
 
               {/* Step 2: Details */}
               {currentStep === 2 && (
-                <div className="space-y-4 sm:space-y-5 md:space-y-6">
-                  <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-5 md:mb-6">
-                    <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
-                    <h2 className="font-serif text-xl sm:text-2xl font-black text-black">Détails</h2>
+                <div className="space-y-3 sm:space-y-4">
+                  <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                    <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
+                    <h2 className="font-serif text-lg sm:text-xl font-black text-black">Détails</h2>
                   </div>
                   <div>
-                    <label htmlFor="description" className="block text-xs sm:text-sm font-black text-black mb-2 sm:mb-3 uppercase tracking-wide">
+                    <label htmlFor="description" className="block text-xs font-black text-black mb-2 uppercase tracking-wide">
                       Décrivez votre besoin en détail
                     </label>
                     <textarea
@@ -371,7 +378,7 @@ export default function PostNeedPage() {
                       placeholder="Fournissez plus de contexte sur ce dont vous avez besoin et pourquoi. Incluez toute exigence spécifique ou délai."
                       {...register('description')}
                       rows={5}
-                      className={`w-full py-3 sm:py-4 px-3 sm:px-4 border-2 rounded-xl bg-white text-black font-bold text-sm sm:text-base md:text-lg focus:outline-none resize-none ${
+                      className={`w-full py-2.5 sm:py-3 px-3 border-2 rounded-lg bg-white text-black font-bold text-sm focus:outline-none resize-none ${
                         errors.description ? 'border-red-600' : 'border-green-600/30 focus:border-green-600'
                       }`}
                     />
@@ -384,13 +391,13 @@ export default function PostNeedPage() {
                   </div>
 
                   <div>
-                    <label htmlFor="urgencyLevel" className="block text-xs sm:text-sm font-black text-black mb-2 sm:mb-3 uppercase tracking-wide">
+                    <label htmlFor="urgencyLevel" className="block text-xs font-black text-black mb-2 uppercase tracking-wide">
                       Niveau d'Urgence
                     </label>
                     <select
                       id="urgencyLevel"
                       {...register('urgencyLevel')}
-                      className={`w-full py-4 sm:py-5 md:py-6 border-2 rounded-xl bg-white text-black font-bold text-sm sm:text-base md:text-lg focus:outline-none px-3 sm:px-4 cursor-pointer ${
+                      className={`w-full py-2.5 sm:py-3 border-2 rounded-lg bg-white text-black font-bold text-sm focus:outline-none px-3 cursor-pointer ${
                         errors.urgencyLevel ? 'border-red-600' : 'border-green-600/30 focus:border-green-600'
                       }`}
                     >
@@ -410,19 +417,19 @@ export default function PostNeedPage() {
 
               {/* Step 3: Location & Contact */}
               {currentStep === 3 && (
-                <div className="space-y-4 sm:space-y-5 md:space-y-6">
-                  <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-5 md:mb-6">
-                    <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
-                    <h2 className="font-serif text-xl sm:text-2xl font-black text-black">Localisation & Contact</h2>
+                <div className="space-y-3 sm:space-y-4">
+                  <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                    <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" />
+                    <h2 className="font-serif text-lg sm:text-xl font-black text-black">Localisation & Contact</h2>
                   </div>
                   <div>
-                    <label htmlFor="city" className="block text-xs sm:text-sm font-black text-black mb-2 sm:mb-3 uppercase tracking-wide">
+                    <label htmlFor="city" className="block text-xs font-black text-black mb-2 uppercase tracking-wide">
                       Dans quelle ville êtes-vous ?
                     </label>
                     <select
                       id="city"
                       {...register('city')}
-                      className={`w-full py-4 sm:py-5 md:py-6 border-2 rounded-xl bg-white text-black font-bold text-sm sm:text-base md:text-lg focus:outline-none px-3 sm:px-4 cursor-pointer ${
+                      className={`w-full py-2.5 sm:py-3 border-2 rounded-lg bg-white text-black font-bold text-sm focus:outline-none px-3 cursor-pointer ${
                         errors.city ? 'border-red-600' : 'border-red-600/30 focus:border-red-600'
                       }`}
                     >
@@ -445,17 +452,17 @@ export default function PostNeedPage() {
                   </div>
 
                   <div>
-                    <label htmlFor="whatsapp" className="block text-xs sm:text-sm font-black text-black mb-2 sm:mb-3 uppercase tracking-wide">
+                    <label htmlFor="whatsapp" className="block text-xs font-black text-black mb-2 uppercase tracking-wide">
                       Numéro WhatsApp
                     </label>
                     <div className="relative">
-                      <Phone className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-red-600" />
+                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-red-600" />
                       <Input
                         id="whatsapp"
                         type="tel"
                         placeholder="+212 6XX XXX XXX ou 06XX XXX XXX"
                         {...register('whatsapp')}
-                        className={`w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-4 sm:py-5 md:py-6 border-2 rounded-xl text-sm sm:text-base md:text-lg font-bold text-black ${
+                        className={`w-full pl-10 pr-3 py-2.5 sm:py-3 border-2 rounded-lg text-sm font-bold text-black ${
                           errors.whatsapp ? 'border-red-600' : 'border-red-600/30 focus:border-red-600'
                         }`}
                       />
@@ -475,55 +482,55 @@ export default function PostNeedPage() {
 
               {/* Step 4: Review */}
               {currentStep === 4 && (
-                <div className="space-y-6">
-                  <div className="flex items-center gap-3 mb-6">
-                    <CheckCircle2 className="w-6 h-6 text-green-600" />
-                    <h2 className="font-serif text-2xl font-black text-black">Révision</h2>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <CheckCircle2 className="w-5 h-5 text-green-600" />
+                    <h2 className="font-serif text-xl font-black text-black">Révision</h2>
                   </div>
                   
                   {/* Review Card */}
-                  <div className="group relative overflow-hidden rounded-3xl border-4 border-[#C17A3F]/30 bg-white">
-                    <div className="absolute inset-0 zellige-pattern opacity-[0.03]" />
-                    <div className="relative p-8">
-                      <h3 className="font-black text-black mb-6 text-xl">Vérifiez Votre Demande</h3>
-                      <div className="space-y-5">
+                  <div className="group relative overflow-hidden rounded-xl border-2 border-[#C17A3F]/30 bg-white">
+                    <div className="absolute inset-0 zellige-pattern opacity-[0.02]" />
+                    <div className="relative p-4 sm:p-5">
+                      <h3 className="font-black text-black mb-4 text-base sm:text-lg">Vérifiez Votre Demande</h3>
+                      <div className="space-y-3">
                         <div>
-                          <p className="text-xs font-black uppercase tracking-wide text-red-600 mb-1">Titre</p>
-                          <p className="text-lg font-bold text-black">{getValues('title') || '(Non fourni)'}</p>
+                          <p className="text-[10px] font-black uppercase tracking-wide text-red-600 mb-1">Titre</p>
+                          <p className="text-sm font-bold text-black">{getValues('title') || '(Non fourni)'}</p>
                         </div>
                         <div>
-                          <p className="text-xs font-black uppercase tracking-wide text-red-600 mb-1">Catégorie</p>
-                          <p className="text-lg font-bold text-black">{getValues('category') || '(Non fourni)'}</p>
+                          <p className="text-[10px] font-black uppercase tracking-wide text-red-600 mb-1">Catégorie</p>
+                          <p className="text-sm font-bold text-black">{getValues('category') || '(Non fourni)'}</p>
                         </div>
                         <div>
-                          <p className="text-xs font-black uppercase tracking-wide text-red-600 mb-1">Ville</p>
-                          <p className="text-lg font-bold text-black">{getValues('city') || '(Non fourni)'}</p>
+                          <p className="text-[10px] font-black uppercase tracking-wide text-red-600 mb-1">Ville</p>
+                          <p className="text-sm font-bold text-black">{getValues('city') || '(Non fourni)'}</p>
                         </div>
                         <div>
-                          <p className="text-xs font-black uppercase tracking-wide text-red-600 mb-1">Urgence</p>
-                          <p className="text-lg font-bold text-black capitalize">
+                          <p className="text-[10px] font-black uppercase tracking-wide text-red-600 mb-1">Urgence</p>
+                          <p className="text-sm font-bold text-black capitalize">
                             {getValues('urgencyLevel') === 'low' ? 'Faible' : getValues('urgencyLevel') === 'medium' ? 'Moyen' : 'Élevé'}
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs font-black uppercase tracking-wide text-red-600 mb-1">Description</p>
-                          <p className="text-lg font-bold text-black line-clamp-3">
+                          <p className="text-[10px] font-black uppercase tracking-wide text-red-600 mb-1">Description</p>
+                          <p className="text-sm font-bold text-black line-clamp-3">
                             {getValues('description') || '(Non fourni)'}
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs font-black uppercase tracking-wide text-red-600 mb-1">WhatsApp</p>
-                          <p className="text-lg font-bold text-black">{getValues('whatsapp') || '(Non fourni)'}</p>
+                          <p className="text-[10px] font-black uppercase tracking-wide text-red-600 mb-1">WhatsApp</p>
+                          <p className="text-sm font-bold text-black">{getValues('whatsapp') || '(Non fourni)'}</p>
                         </div>
                       </div>
                     </div>
                   </div>
 
                   {/* Note Card */}
-                  <div className="group relative overflow-hidden rounded-3xl border-4 border-green-600/30 bg-white">
-                    <div className="absolute inset-0 zellige-pattern opacity-[0.03]" />
-                    <div className="relative p-6">
-                      <p className="text-base font-bold text-black">
+                  <div className="group relative overflow-hidden rounded-xl border-2 border-green-600/30 bg-white">
+                    <div className="absolute inset-0 zellige-pattern opacity-[0.02]" />
+                    <div className="relative p-4">
+                      <p className="text-sm font-bold text-black">
                         <span className="text-red-600">Note :</span> Votre besoin sera visible par la communauté. Veuillez vous assurer que toutes les informations sont exactes.
                       </p>
                     </div>
@@ -542,9 +549,9 @@ export default function PostNeedPage() {
               variant="outline"
               onClick={handleBack}
               disabled={currentStep === 1}
-              className="border-2 border-red-600 text-red-600 hover:bg-red-600 hover:text-white font-bold px-4 sm:px-6 md:px-8 py-4 sm:py-5 md:py-6 disabled:opacity-50 bg-white rounded-xl cursor-pointer text-sm sm:text-base w-full sm:w-auto"
+              className="border-2 border-red-600 text-red-600 hover:bg-red-600 hover:text-white font-bold px-4 sm:px-6 py-2.5 sm:py-3 disabled:opacity-50 bg-white rounded-lg cursor-pointer text-sm w-full sm:w-auto"
             >
-              <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+              <ArrowLeft className="h-4 w-4 mr-2" />
               Retour
             </Button>
 
@@ -561,17 +568,17 @@ export default function PostNeedPage() {
                   form="post-need-form"
                   onClick={handleSubmit(onSubmit)}
                   disabled={isSubmitting}
-                  className="bg-[#C17A3F] hover:bg-[#A05A2E] text-white font-black px-6 sm:px-8 md:px-10 py-4 sm:py-5 md:py-6 text-sm sm:text-base md:text-lg shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl border-2 border-[#D4AF37]/30 cursor-pointer disabled:opacity-50 w-full sm:w-auto"
+                  className="bg-[#C17A3F] hover:bg-[#A05A2E] text-white font-black px-5 sm:px-6 py-2.5 sm:py-3 text-sm shadow-lg hover:shadow-xl transition-all duration-300 rounded-lg border-2 border-[#D4AF37]/30 cursor-pointer disabled:opacity-50 w-full sm:w-auto"
                 >
                   {isSubmitting ? (
                     <>
-                      <span className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
                       Publication...
                     </>
                   ) : (
                     <>
                       Publier Votre Besoin
-                      <ArrowUpRight className="h-4 w-4 sm:h-5 sm:w-5 ml-2" />
+                      <ArrowUpRight className="h-4 w-4 ml-2" />
                     </>
                   )}
                 </Button>
@@ -580,10 +587,10 @@ export default function PostNeedPage() {
               <Button
                 type="button"
                 onClick={handleNext}
-                className="bg-[#C17A3F] hover:bg-[#A05A2E] text-white font-black px-6 sm:px-8 md:px-10 py-4 sm:py-5 md:py-6 text-sm sm:text-base md:text-lg shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl border-2 border-[#D4AF37]/30 cursor-pointer w-full sm:w-auto"
+                className="bg-[#C17A3F] hover:bg-[#A05A2E] text-white font-black px-5 sm:px-6 py-2.5 sm:py-3 text-sm shadow-lg hover:shadow-xl transition-all duration-300 rounded-lg border-2 border-[#D4AF37]/30 cursor-pointer w-full sm:w-auto"
               >
                 Étape Suivante
-                <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 ml-2" />
+                <ChevronRight className="h-4 w-4 ml-2" />
               </Button>
             )}
           </div>

@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { Inter, Playfair_Display, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { SuppressHydration } from './components/suppress-hydration'
+import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
 
 const inter = Inter({ subsets: ["latin"], variable: '--font-sans' });
@@ -45,6 +46,7 @@ export default function RootLayout({
       >
         <SuppressHydration />
         {children}
+        <Toaster />
         <Analytics />
       </body>
     </html>

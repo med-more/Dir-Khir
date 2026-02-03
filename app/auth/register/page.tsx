@@ -12,6 +12,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { signUp, signIn } from '@/lib/auth/actions'
 import { useRouter } from 'next/navigation'
+import { toast } from '@/lib/utils/toast'
 
 // Zod Schema for Register
 const registerSchema = z.object({
@@ -64,24 +65,31 @@ export default function RegisterPage() {
     setSubmitError(null)
     setIsLoading(true)
     
+    const loadingToast = toast.loading('Création de votre compte...')
+    
     try {
       console.log('=== CLIENT: Starting signup ===')
       const result = await signUp(data.name, data.email, data.password)
       console.log('=== CLIENT: Signup result ===', result)
       
       if (result.error) {
+        toast.error('Erreur d\'inscription', result.error)
         setSubmitError(result.error)
         setIsLoading(false)
       } else {
         // Rediriger vers login après inscription réussie
         // L'utilisateur devra se connecter manuellement
         setSubmitError(null)
-        alert('Compte créé avec succès ! Redirection vers la page de connexion...')
-        router.push('/auth/login?registered=true')
+        toast.success('Compte créé avec succès !', 'Redirection vers la page de connexion...')
+        setTimeout(() => {
+          router.push('/auth/login?registered=true')
+        }, 1500)
       }
     } catch (error) {
       console.error('=== CLIENT: Registration error ===', error)
-      setSubmitError('Une erreur est survenue lors de l\'inscription')
+      const errorMessage = 'Une erreur est survenue lors de l\'inscription'
+      toast.error('Erreur', errorMessage)
+      setSubmitError(errorMessage)
       setIsLoading(false)
     }
   }

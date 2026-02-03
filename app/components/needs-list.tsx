@@ -5,6 +5,7 @@ import { ActionCard } from '@/components/ui/action-card';
 import { getNeeds, participateInNeed } from '@/lib/actions/needs';
 import { Phone, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { toast } from '@/lib/utils/toast';
 
 interface Need {
   id: string;
@@ -83,13 +84,14 @@ export function NeedsList({ initialNeeds, selectedCategory, selectedCity }: Need
     const result = await participateInNeed(needId);
     
     if (result.error) {
-      alert(result.error);
+      toast.error('Erreur', result.error);
       setParticipating(prev => {
         const newSet = new Set(prev);
         newSet.delete(needId);
         return newSet;
       });
     } else {
+      toast.success('Participation enregistrée !', 'Merci pour votre engagement dans la communauté.')
       // Mettre à jour le compteur localement
       setNeeds(prevNeeds =>
         prevNeeds.map(need =>
@@ -151,9 +153,9 @@ export function NeedsList({ initialNeeds, selectedCategory, selectedCity }: Need
   console.log('=== NEEDSLIST: Rendering needs ===', needs.length, 'needs');
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
       {needs.map((need) => (
-        <div key={need.id} className="group relative overflow-hidden rounded-3xl border-4 border-[#C17A3F]/30 bg-white transition-all duration-500 hover:shadow-2xl hover:border-[#C17A3F] hover:-translate-y-3 h-full flex flex-col cursor-pointer">
+        <div key={need.id} className="group relative overflow-hidden rounded-xl sm:rounded-2xl md:rounded-3xl border-2 sm:border-3 md:border-4 border-[#C17A3F]/30 bg-white transition-all duration-500 hover:shadow-2xl hover:border-[#C17A3F] hover:-translate-y-3 h-full flex flex-col cursor-pointer">
           {/* Moroccan Zellige Pattern Background */}
           <div className="absolute inset-0 zellige-pattern opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-500" />
 
@@ -166,47 +168,47 @@ export function NeedsList({ initialNeeds, selectedCategory, selectedCity }: Need
           </div>
 
           {/* Content */}
-          <div className="relative p-6 flex-1 flex flex-col z-10">
+          <div className="relative p-4 sm:p-5 md:p-6 flex-1 flex flex-col z-10">
             {/* Category Badge */}
-            <div className="mb-4 inline-flex w-fit">
-              <div className="px-4 py-1.5 bg-gradient-to-r from-[#C17A3F]/10 to-[#2D8659]/10 border-2 border-[#C17A3F]/40 rounded-full">
-                <span className="text-xs font-black uppercase tracking-wider text-[#C17A3F]">
+            <div className="mb-3 sm:mb-4 inline-flex w-fit">
+              <div className="px-3 sm:px-4 py-1 sm:py-1.5 bg-gradient-to-r from-[#C17A3F]/10 to-[#2D8659]/10 border-2 border-[#C17A3F]/40 rounded-full">
+                <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#C17A3F]">
                   {need.category}
                 </span>
               </div>
             </div>
 
             {/* Title */}
-            <h3 className="font-serif text-xl font-black text-black leading-tight mb-3 text-balance">
+            <h3 className="font-serif text-lg sm:text-xl font-black text-black leading-tight mb-2 sm:mb-3 text-balance">
               {need.title}
             </h3>
 
             {/* Description */}
-            <p className="text-sm text-black/70 leading-relaxed mb-4 line-clamp-2 flex-grow">
+            <p className="text-xs sm:text-sm text-black/70 leading-relaxed mb-3 sm:mb-4 line-clamp-2 flex-grow">
               {need.description}
             </p>
 
             {/* Divider */}
-            <div className="my-4 relative">
+            <div className="my-3 sm:my-4 relative">
               <div className="h-px bg-gradient-to-r from-transparent via-[#C17A3F]/30 to-transparent" />
             </div>
 
             {/* Footer Info */}
-            <div className="flex items-center justify-between gap-3 mb-4">
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-[#FFF8E7] rounded-lg border border-[#C17A3F]/20">
-                <span className="text-xs">📍</span>
-                <span className="font-bold text-black text-xs">{need.city}</span>
+            <div className="flex items-center justify-between gap-2 sm:gap-3 mb-3 sm:mb-4">
+              <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 bg-[#FFF8E7] rounded-lg border border-[#C17A3F]/20">
+                <span className="text-[10px] sm:text-xs">📍</span>
+                <span className="font-bold text-black text-[10px] sm:text-xs">{need.city}</span>
               </div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#2D8659]/10 rounded-lg border border-[#2D8659]/20">
-                <span className="text-xs">👥</span>
-                <span className="font-black text-[#2D8659] text-xs">{need.volunteersCount}</span>
+              <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-[#2D8659]/10 rounded-lg border border-[#2D8659]/20">
+                <span className="text-[10px] sm:text-xs">👥</span>
+                <span className="font-black text-[#2D8659] text-[10px] sm:text-xs">{need.volunteersCount}</span>
               </div>
             </div>
 
             {/* Status Badge */}
-            <div className="mb-4 inline-flex w-fit">
-              <div className="px-3 py-1 bg-green-100 border-2 border-green-600 rounded-full">
-                <span className="text-xs font-black uppercase tracking-wider text-green-600">Ouvert</span>
+            <div className="mb-3 sm:mb-4 inline-flex w-fit">
+              <div className="px-2 sm:px-3 py-0.5 sm:py-1 bg-green-100 border-2 border-green-600 rounded-full">
+                <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-green-600">Ouvert</span>
               </div>
             </div>
 

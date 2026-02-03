@@ -4,13 +4,14 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge-custom';
-import { Heart, MessageSquare, Clock, CheckCircle, Plus, LogOut, Settings, MapPin, Flame, FileText, Users, TrendingUp, HandHeart, ArrowUpRight, Phone, AlertCircle } from 'lucide-react';
+import { Heart, MessageSquare, Clock, CheckCircle, Plus, LogOut, MapPin, Flame, FileText, Users, TrendingUp, HandHeart, ArrowUpRight, Phone, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getUserNeeds, getUserParticipations, markNeedAsResolved } from '@/lib/actions/needs';
 import { signOut } from '@/lib/auth/actions';
 import { useRouter } from 'next/navigation';
 import { getSession } from '@/lib/auth/actions';
+import { toast } from '@/lib/utils/toast';
 
 interface Need {
   id: string;
@@ -77,7 +78,17 @@ export function DashboardContent() {
   }, [router]);
 
   const handleSignOut = async () => {
-    await signOut();
+    try {
+      toast.info('Déconnexion...', 'À bientôt !');
+      await signOut();
+      // signOut will redirect, but we can also do a client-side redirect as fallback
+      router.push('/');
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error('Erreur lors de la déconnexion', 'Veuillez réessayer.');
+      // Force redirect even on error
+      router.push('/');
+    }
   };
 
   const handleMarkResolved = async (needId: string) => {
@@ -88,8 +99,9 @@ export function DashboardContent() {
     const result = await markNeedAsResolved(needId);
 
     if (result.error) {
-      alert(result.error);
+      toast.error('Erreur', result.error);
     } else {
+      toast.success('Besoin marqué comme résolu !', 'Merci pour votre contribution à la communauté.')
       // Mettre à jour le statut localement
       setUserNeeds(prevNeeds =>
         prevNeeds.map(need =>
@@ -169,9 +181,6 @@ export function DashboardContent() {
               </div>
             </Link>
             <div className="flex items-center gap-2 sm:gap-3">
-              <Button variant="ghost" size="sm" className="text-black hover:text-red-600 hover:bg-[#FFF8E7] transition-all duration-300 cursor-pointer p-2">
-                <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
-              </Button>
               <Button 
                 variant="ghost" 
                 size="sm" 
